@@ -30,9 +30,10 @@ fabric-backup: ## Run ansible playbook to backup switch fabric via eAPI
 fabric-debug: ## Run ansible playbook to build Fabric configuration for AVD Fabric and CVP with debugging enabled
 	ansible-playbook playbooks/fabric-deploy.yml --tags build,debug -i inventory.yml
 
-.PHONY: initial-deploy
-initial-deploy: ## Deploy Fabric configuration for ATD Fabric using SSH/eAPI (Bypass CVP)
-	ansible-playbook playbooks/fabric-ssh-deploy.yml -i inventory.yml
+.PHONY: fabric-initialize
+fabric-initialize: ## Initial Deployment for the AVD topology
+	ansible-playbook playbooks/fabric-deploy.yml --tags provision -i inventory.yml
+	ansible-playbook playbooks/fabric-init.yml -i inventory.yml
 
 .PHONY: update-configlet
 update-configlet: ## Run ansible playbook to update configlets on CloudVision
@@ -42,6 +43,7 @@ update-configlet: ## Run ansible playbook to update configlets on CloudVision
 atd-setup: ## Run ansible playbook to Setup ATD Environment
 	ansible-galaxy collection install arista.avd --upgrade
 	ansible-galaxy collection install git+https://github.com/aristanetworks/ansible-avd.git#/ansible_collections/arista/avd/,devel
+	ansible-galaxy collection install git+https://github.com/aristanetworks/ansible-cvp.git#/ansible_collections/arista/cvp/,devel
 	ansible-playbook playbooks/atd-setup.yml
 
 .PHONY: fabric-cleanup
@@ -51,6 +53,7 @@ fabric-cleanup: ## Run ansible playbook to build Fabric configuration for ATD Fa
 .PHONY: update-devel
 update-devel: ## Update to the latest arista.avd collections development branch
 	ansible-galaxy collection install git+https://github.com/aristanetworks/ansible-avd.git#/ansible_collections/arista/avd/,devel
+	ansible-galaxy collection install git+https://github.com/aristanetworks/ansible-cvp.git#/ansible_collections/arista/cvp/,devel
 
 .PHONY: update-collections
 update-collections: ## Update arista.avd collections to latest release branch
